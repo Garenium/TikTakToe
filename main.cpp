@@ -6,7 +6,14 @@
 #include <unistd.h>
 
 
-const char arr[9] = {'-','-','-','-','-','-','-','-','-',};
+char arr[9] = {'-','-','-','-','-','-','-','-','-',};
+int movements[9] = { 0 };
+
+void help(){
+    const char* help_grid = "0|1|2\n3|4|5\n6|7|8";
+    std::cout << help_grid << '\n' << std::endl;
+    std::cout << "Syntax:\n coordinate x|y\n" << std::endl;
+}
 
 void printXO(){
     for(size_t i = 0; i < 3; ++i){
@@ -18,14 +25,22 @@ void printXO(){
     std::cout << std::endl;
 }
 
-
-void help(){
-    const char* help_grid = "0|1|2\n3|4|5\n6|7|8";
-    std::cout << help_grid << '\n' << std::endl;
-    std::cout << "Syntax:\n coordinate x|y\n" << std::endl;
+void computer_move(char x_or_o){
+    int index = rand() % 10;
+    arr[index] = x_or_o;
+    for(size_t i = 0; i < 9; ++i){
+        if(i != 0 && i != index && i % 2 == 0)
+            std::cout << "-\n";
+        else
+            std::cout << arr[i];
+    }
+    std::cout << std::endl;
 }
 
+
 int main(int argc, char* argv[]){
+
+    srand(time(NULL));
 
     //Variables
     std::string user_input = "";
@@ -34,9 +49,9 @@ int main(int argc, char* argv[]){
     const char* ptr = NULL;
     //0 is o 
     //1 is x 
-    int x_or_o = 0;
-    int c = 0;
+    char x_or_o = 0;
 
+    int c = 0;
     while((c = getopt(argc,argv,"ih")) != -1){
         switch(c){
             case 'i':
@@ -47,7 +62,6 @@ int main(int argc, char* argv[]){
                 break;
         }
     }
-
 
     if(h_help == true){
         std::cout << "\nHELP:" << std::endl;
@@ -69,7 +83,9 @@ int main(int argc, char* argv[]){
 
         if(prompt_i_start == false){
             std::cout << "Computer: " << std::endl;
-            printXO();
+            x_or_o = rand() % 1;
+            x_or_o == 0 ? x_or_o = 'O' : x_or_o = 'X';
+            computer_move(x_or_o);
         }
     }
 
