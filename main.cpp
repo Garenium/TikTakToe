@@ -4,21 +4,40 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <random>
+#include "debug.cpp"
 
+char arr[3][3] = {
+    '-','-','-',
+    '-','-','-',
+    '-','-','-'
+};
 
-char arr[9] = {'-','-','-','-','-','-','-','-','-',};
+/* char arr[9] = {'-','-','-', '-','-','-', '-','-','-' }; */
+
 int movements[9] = { 0 };
+std::random_device rd;
+std::default_random_engine generator(rd()); 
 
 void help(){
-    const char* help_grid = "0|1|2\n3|4|5\n6|7|8";
+    const char* help_grid = "0,0|0,1|0,2\n------------\n1,0|1,1|1,2\n------------\n2,0|2,1|2,2";
+
     std::cout << help_grid << '\n' << std::endl;
     std::cout << "Syntax:\n coordinate x|y\n" << std::endl;
 }
 
+void printArray(){
+    for(size_t i = 0; i < 9; ++i){
+        std::cout << arr[i];
+    }
+    std::cout << '\n' << std::endl;
+}
+
+
 void printXO(){
     for(size_t i = 0; i < 3; ++i){
-        for(size_t y = 0; y < 3; ++y){
-            std::cout << arr[i];
+        for(size_t j = 0; j < 3; ++j){
+            std::cout << arr[i][j];
         }
         std::cout << '\n';
     }
@@ -26,21 +45,19 @@ void printXO(){
 }
 
 void computer_move(char x_or_o){
-    int index = rand() % 10;
-    arr[index] = x_or_o;
-    for(size_t i = 0; i < 9; ++i){
-        if(i != 0 && i != index && i % 2 == 0)
-            std::cout << "-\n";
-        else
-            std::cout << arr[i];
-    }
-    std::cout << std::endl;
+    std::uniform_int_distribution<int> distribution(0,2);
+    int row_index = distribution(generator);
+    int col_index = distribution(generator);
+    printf("Computer: row: %d, column: %d\n", row_index, col_index);
+    arr[row_index][col_index] = x_or_o;
+    printXO();
 }
 
 
 int main(int argc, char* argv[]){
 
-    srand(time(NULL));
+    /* srand(time(NULL)); */
+    std::uniform_int_distribution<int> distribution_x_or_o(0,1);
 
     //Variables
     std::string user_input = "";
@@ -82,8 +99,7 @@ int main(int argc, char* argv[]){
         (user_input[0] == 'y' || user_input[0] == 'Y') ? prompt_i_start = true : prompt_i_start = false;
 
         if(prompt_i_start == false){
-            std::cout << "Computer: " << std::endl;
-            x_or_o = rand() % 1;
+            x_or_o = distribution_x_or_o(generator);
             x_or_o == 0 ? x_or_o = 'O' : x_or_o = 'X';
             computer_move(x_or_o);
         }
