@@ -13,26 +13,16 @@ char arr[3][3] = {
     '-','-','-'
 };
 
-/* char arr[9] = {'-','-','-', '-','-','-', '-','-','-' }; */
-
 int movements[9] = { 0 };
 std::random_device rd;
 std::default_random_engine generator(rd()); 
 
 void help(){
-    const char* help_grid = "0,0|0,1|0,2\n------------\n1,0|1,1|1,2\n------------\n2,0|2,1|2,2";
+    const char* help_grid = "1|2|3\n-----\n4|5|6\n-----\n7|8|9";
 
     std::cout << help_grid << '\n' << std::endl;
     std::cout << "Syntax:\n coordinate x|y\n" << std::endl;
 }
-
-void printArray(){
-    for(size_t i = 0; i < 9; ++i){
-        std::cout << arr[i];
-    }
-    std::cout << '\n' << std::endl;
-}
-
 
 void printXO(){
     for(size_t i = 0; i < 3; ++i){
@@ -44,21 +34,44 @@ void printXO(){
     std::cout << std::endl;
 }
 
-void computer_move(char x_or_o){
+void computer_move(const char* computer_xo){
+    //loop the arr to check if the game is won by the user or by the player
+
+    //use/take that info to determine the next move
     std::uniform_int_distribution<int> distribution(0,2);
     int row_index = distribution(generator);
     int col_index = distribution(generator);
-    printf("Computer: row: %d, column: %d\n", row_index, col_index);
-    arr[row_index][col_index] = x_or_o;
+    printf("Computer:\nRow: %d, Column: %d\n", row_index, col_index);
+    arr[row_index][col_index] = *computer_xo;
     printXO();
+}
+
+void user_select_xo(char* computer_xo){
+
+    std::string user_input = "";
+    char selected_input = '\0';
+    while(*computer_xo != 'X' || *computer_xo != 'O'){
+        std::cout << "X or O? (X is default): ";
+        std::getline(std::cin, user_input); 
+
+        
+        if(user_input.length() == 0){
+            user_input = "X";}
+
+        char selected_input = std::toupper(user_input[0]);
+
+            if(selected_input == 'X'){ *computer_xo = 'O'; break; }
+            else if(selected_input == 'O') { *computer_xo = 'X'; break; }
+            else { std::cout << "Please try again..." << std::endl; continue; }
+    }
+    std::cout << "You have selected: "<< user_input << std::endl;
 }
 
 
 int main(int argc, char* argv[]){
 
-    /* srand(time(NULL)); */
+    //VARIABLES
     std::uniform_int_distribution<int> distribution_x_or_o(0,1);
-
     //Variables
     std::string user_input = "";
     bool i_start = false;
@@ -66,8 +79,9 @@ int main(int argc, char* argv[]){
     const char* ptr = NULL;
     //0 is o 
     //1 is x 
-    char x_or_o = 0;
+    char computer_xo = 0;
 
+    //COMMAND LINE ARGS
     int c = 0;
     while((c = getopt(argc,argv,"ih")) != -1){
         switch(c){
@@ -84,32 +98,47 @@ int main(int argc, char* argv[]){
         std::cout << "\nHELP:" << std::endl;
         help();
     }
-    
+
+    //WELCOME 
     //Print the XO grid  
-    std::cout << "The Grid:" << std::endl;
+    std::cout << "The Grid (emtpy):" << std::endl;
     printXO();
     
+    //PREPARATION
     //Don't prompt if you want to start immediately
     if(i_start == false){
+        std::cout << std::endl;
         bool prompt_i_start = true;
-        std::cout << "Do you want to start? (Y/n)" << std::endl;
-        std::cin >> user_input;
-        std::cout << '\n';
+        std::cout << "Do you want to start? (Y/n): ";
+        std::getline(std::cin, user_input);
 
-        (user_input[0] == 'y' || user_input[0] == 'Y') ? prompt_i_start = true : prompt_i_start = false;
+        std::cout << '\n' << std::endl;
+
+        if (user_input.empty() || user_input[0] == 'y' || user_input[0] == 'Y')    
+            prompt_i_start = true ;
+        else 
+            prompt_i_start = false;
+
 
         if(prompt_i_start == false){
-            x_or_o = distribution_x_or_o(generator);
-            x_or_o == 0 ? x_or_o = 'O' : x_or_o = 'X';
-            computer_move(x_or_o);
+            computer_xo = distribution_x_or_o(generator);
+            computer_xo == 0 ? computer_xo = 'O' : computer_xo = 'X';
+            computer_move(&computer_xo);
         }
+        else
+            user_select_xo(&computer_xo);
+    }
+    else{
+        user_select_xo(&computer_xo);
+
     }
 
+    //START THE GAME (PROMPT THE USER FOR A MOVE)
     while(true){
         std::cout << "User: ";
         std::cin >> user_input;
 
-        if(user_input[0] != '\n' && strspn(user_input.c_str(), "xXoO") == 1){
+        if(user_input[0] != '\n' && strspn(user_input.c_str(), "123456789") == 1){
             std::cout << "Correct input" << std::endl;
             return 0;
         }
