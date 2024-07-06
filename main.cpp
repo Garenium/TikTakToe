@@ -99,15 +99,15 @@ void computer_move(const char* computer_xo){
             break;
         }
         else{
-            std::cout << "TODO: Debug computer_move()" << std::endl;
-            /* continue; */
-            exit(0);
+            /* std::cout << "TODO: Debug computer_move()" << std::endl; */
+            continue;
+            /* exit(0); */
         }
     }
     
 }
 
-bool player_move(char* player_square_no, const char* player_xo){
+bool user_move(char* player_square_no, const char* user_xo){
 
     //Make sure if the square input is valid
     int targetRow = 0;
@@ -130,7 +130,7 @@ bool player_move(char* player_square_no, const char* player_xo){
     //If the coordinates have not been selected before, mute the value to 
     //either x or o (for the player)
     if(arr[targetRow][targetCol] == '-'){
-        arr[targetRow][targetCol] = *player_xo;
+        arr[targetRow][targetCol] = *user_xo;
         validMove = true;
     }
     else{
@@ -140,6 +140,25 @@ bool player_move(char* player_square_no, const char* player_xo){
     return validMove;
 }
 
+bool game_check(char player_xo){
+    for(int i = 0; i < 3; ++i) {
+        if(arr[i][0] == player_xo && arr[i][1] == player_xo && arr[i][2] == player_xo){
+            return true;
+        }
+        else if(arr[0][i] == player_xo && arr[1][i] == player_xo && arr[2][i] == player_xo){
+            return true;
+        }
+    }
+
+    if(arr[0][0] == player_xo && arr[1][1] == player_xo && arr[2][2] == player_xo){
+        return true;
+    }
+    if(arr[0][2] == player_xo && arr[1][1] == player_xo && arr[2][0] == player_xo){
+        return true;
+    }
+
+    return false;
+}
 
 
 int main(int argc, char* argv[]){
@@ -152,7 +171,8 @@ int main(int argc, char* argv[]){
     bool h_help = false;
     const char* ptr = NULL;
     char computer_xo = 0;
-    char player_xo = 0;
+    char user_xo = 0;
+    bool gameCheckFlag = false;
 
     //COMMAND LINE ARGS
     int c = 0;
@@ -207,29 +227,38 @@ int main(int argc, char* argv[]){
         user_select_xo(&computer_xo);
     }
 
-    if(computer_xo == 'O') { player_xo = 'X'; }
-    else if (computer_xo == 'X') {player_xo = 'O'; }
+    if(computer_xo == 'O') { user_xo = 'X'; }
+    else if (computer_xo == 'X') {user_xo = 'O'; }
 
-    std::cout << "You have selected: "<< player_xo << std::endl;
+    std::cout << "You have selected: "<< user_xo << std::endl;
     std::cout << "Computer has selected: " << computer_xo << '\n' << std::endl;
 
     //START THE GAME (PROMPT THE USER FOR A MOVE)
 
     while(true){
-        std::cout << "User " << "(" << player_xo << ")" << ": ";
+
+        std::cout << "User " << "(" << user_xo << ")" << ": ";
         std::cin >> user_input;
 
         if(validate_user_move_inp(user_input)){
             /* std::cout << "Correct input" << std::endl; */
             char square_no = user_input[0];
-            if(player_move(&square_no, &player_xo)){
+            if(user_move(&square_no, &user_xo)){
                 computer_move(&computer_xo);
                 printXO();            
+
+                if(game_check(user_xo)){
+                    std::cout << "You have won!" << std::endl;
+                    break;
+                }
+                else if(game_check(computer_xo)){
+                    std::cout << "You lose..." << std::endl;
+                    break;
+                }
             }
-            /* return 0; */
         }
         else{
-            std::cout << "Please retry again..." << std::endl;
+            std::cout << "Please try again [1-9]..." << std::endl;
         }
     }
 
