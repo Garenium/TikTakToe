@@ -1,7 +1,4 @@
 #include <iostream>
-#include <ctype.h>
-#include <stdlib.h>
-#include <cstdlib>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -29,7 +26,6 @@ void help(){
     const char* help_grid = "1|2|3\n-----\n4|5|6\n-----\n7|8|9";
 
     std::cout << help_grid << '\n' << std::endl;
-    /* std::cout << "Syntax:\n coordinate x|y\n" << std::endl; */
 }
 
 
@@ -48,12 +44,12 @@ bool validate_user_move_inp(const std::string& user_input){
     bool isValid = false;
 
     if(user_input.length() == 3 && user_input[1] == ' ' && isdigit(user_input[0]) && isdigit(user_input[2])){
-        std::cout << "DEBUG: Input is valid (length is 3)" << std::endl;
+        /* std::cout << "DEBUG: Input is valid (length is 3)\n" << std::endl; */
         /* std::cout << "INPUT: " << user_input << std::endl; */
         isValid = true;;
     }
     else if(user_input.length() == 1 && user_input[0] != '\n' && isdigit(user_input[0])){
-        std::cout << "DEBUG: Input is valid (length is 1)" << std::endl;
+        /* std::cout << "DEBUG: Input is valid (length is 1)\n" << std::endl; */
         /* std::cout << "INPUT: " << user_input << std::endl; */
         isValid = true;
     }
@@ -63,7 +59,6 @@ bool validate_user_move_inp(const std::string& user_input){
 
 
 void user_select_xo(char* computer_xo){
-
     std::string user_input = "";
     char selected_input = '\0';
     while(*computer_xo != 'X' || *computer_xo != 'O'){
@@ -82,17 +77,11 @@ void user_select_xo(char* computer_xo){
         if(selected_input == 'X'){ *computer_xo = 'O'; break; }
         else if(selected_input == 'O') { *computer_xo = 'X'; break; }
         else { std::cout << "Please try again..." << std::endl; continue; }
-
     }
-
 }
 
 
 void computer_move(const char* computer_xo){
-    //loop the arr to check if the game is won by the user or by the player
-
-    //use/take that info to determine the next move
-    
     while(true){
         std::uniform_int_distribution<int> distribution(0,2);
         int row_index = distribution(generator);
@@ -106,9 +95,8 @@ void computer_move(const char* computer_xo){
             break;
         }
         else{
-            /* std::cout << "TODO: Debug computer_move()" << std::endl; */
+            //If the index has been selected before, loop
             continue;
-            /* exit(0); */
         }
     }
     
@@ -123,7 +111,8 @@ bool user_move(const std::string& player_input, const char* user_xo){
     
 
     bool foundCoordinate = false;
-    /* std::cout << "user_move player_input length: " << strlen(player_input) << std::endl; */
+
+    //If the input is the number of the square
     if(player_input.length() == 1){
         //Find the coordinates for the player_square_no
         for(int i = 0; i < 3 && !foundCoordinate; i++){
@@ -136,7 +125,7 @@ bool user_move(const std::string& player_input, const char* user_xo){
             }
         }
     }
-    else{
+    else{ //If the input is the index of the square
        targetRow = player_input[0] - '0';
        targetCol = player_input[2] - '0';
     }
@@ -213,7 +202,7 @@ int main(int argc, char* argv[]){
     printXO();
     
     //PREPARATION
-    //Don't prompt if you want to start immediately
+    //Don't prompt if the user wants to start immediately
     if(i_start == false){
         std::cout << std::endl;
         bool prompt_i_start = true;
@@ -258,12 +247,9 @@ int main(int argc, char* argv[]){
     while(true){
 
         std::cout << "User " << "(" << user_xo << ")" << ": ";
-        /* std::cin >> user_input; */
         std::getline(std::cin, user_input);
 
         if(validate_user_move_inp(user_input)){
-            /* std::cout << "Correct input" << std::endl; */
-            /* char square_no = user_input[0]; */
             if(user_move(user_input, &user_xo)){
                 computer_move(&computer_xo);
                 printXO();            
